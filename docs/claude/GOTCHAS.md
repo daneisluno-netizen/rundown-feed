@@ -18,6 +18,14 @@ than none.
 
 ---
 
+## A session branch pushes to `main` on a bare `git push`
+- **Cause:** `git checkout -B claude/<slug> origin/main` sets the new branch's
+  upstream to `origin/main`, not to itself. A later bare `git push` therefore
+  targets `main`. Nothing warns you — the push succeeds.
+- **Fix:** Always push the first commit with `git push -u origin HEAD`, which
+  repoints upstream at the session branch. Verify with
+  `git rev-parse --abbrev-ref @{u}` — it must name your own branch.
+
 ## Podcast clients silently reject the feed when served from Google Drive
 - **Cause:** Drive serves any `.xml` as `application/octet-stream` with
   `Content-Disposition: attachment`. There is no setting to change it. Clients

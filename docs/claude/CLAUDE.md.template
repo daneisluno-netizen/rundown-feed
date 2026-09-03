@@ -43,9 +43,13 @@ what fails if it is missing.>
 
 ## Branch and workflow
 
-- Active branch: <name>
-- <Who else pushes here. Whether multiple Claude sessions run against it.>
-- <Whether to commit directly or open a PR.>
+- **Integration branch (`$TARGET`): <name>** — the branch session work merges
+  back into. Never commit to it directly.
+- One branch per session: `claude/<short-task-slug>`, cut from `$TARGET`,
+  pushed on the first commit, merged back before the session ends. Full
+  protocol in `docs/claude/WORKING-AGREEMENT.md` section 2.
+- <Merge directly, or open a PR? Say which, and when.>
+- <Anyone else pushing here — Dane, CI, other tooling.>
 
 ## Hard rules
 

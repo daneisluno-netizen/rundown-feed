@@ -26,20 +26,66 @@ Then stop and read the result:
   found and ask before proceeding.
 - **More than ~5 unpushed commits** → this branch is drifting from the remote.
   Say so. Long-lived unpushed stacks are how work gets lost and duplicated.
-- **A branch you were not told to work on** → stop. Ask.
+- **On `main`, or on a shared feature branch** → do not start work here. Cut
+  your own session branch first (section 2).
+- **On a `claude/…` branch you did not create this session** → a previous
+  session left it. Read its diff before adding to it, or start fresh.
 
-## 2. Assume another session is running right now
+## 2. One branch per session
 
-Several sessions often share one branch. That is the single biggest source of
-redone work: two sessions edit the same files, neither knows.
+Never commit to `main` or to a shared long-lived branch. Every session works on
+its own branch and merges back. This is not a preference — several sessions
+often run at once, and a shared branch means two of them edit the same files
+with neither aware of the other.
 
-- Commit in small, complete units. Push as soon as a unit is coherent. An
-  unpushed commit is invisible to every other session.
-- Before a long edit to a shared file, re-check `git status` — a session that
-  started ten minutes ago may already have changed it.
-- Never `git checkout .`, `git reset --hard`, `git stash` someone else's work,
-  or force-push a shared branch. If the tree is in a state you did not create,
-  report it; do not tidy it.
+**Start of session:**
+
+```sh
+TARGET=main                       # or the feature branch you were told to target
+git fetch origin "$TARGET"
+git checkout -B "claude/<short-task-slug>" "origin/$TARGET"
+```
+
+Web and mobile sessions create a `claude/…` branch automatically. CLI and
+bridge sessions do not — they land on whatever branch was last checked out, so
+you must do this explicitly.
+
+**Push on your first commit, not your last:**
+
+```sh
+git push -u origin HEAD
+```
+
+Use `-u origin HEAD`, not a bare `git push`. `checkout -B` set your upstream to
+`$TARGET`, so a bare push would send your work straight to the integration
+branch with no warning. Confirm with `git rev-parse --abbrev-ref @{u}` — it must
+name your own branch.
+
+This is the rule that makes the whole scheme work. An unpushed commit is
+invisible to every other session; a pushed branch is the signal that this work
+exists. Do not batch commits locally and push at the end.
+
+**Finish in the session that started it.** Verify (section 5), merge back into
+`$TARGET` — or open a PR if it's large or you want it reviewed — then delete
+the branch.
+
+**Never:**
+
+- Commit directly to `main` or a shared feature branch
+- Force-push, rebase, amend or reset a branch another session might hold
+- Resume a branch from a previous session without re-reading its diff first
+
+**If `$TARGET` moved while you worked**, merge it in — do not rebase. A merge
+commit keeps every other checkout valid; a rebase breaks them.
+
+```sh
+git fetch origin "$TARGET" && git merge "origin/$TARGET"
+```
+
+**Keep branches short-lived.** The cost of this scheme is merge overhead, and
+it stays small only if a branch is one session, one coherent unit of work,
+merged back before the session ends. A branch that lives for days recreates
+the exact problem it was meant to solve.
 
 ## 3. Preflight: prove you can verify BEFORE you build
 

@@ -6,6 +6,20 @@ Served by GitHub Pages at https://daneisluno-netizen.github.io/rundown-feed/
 Read `docs/claude/WORKING-AGREEMENT.md` before making changes.
 Read `docs/claude/GOTCHAS.md` before debugging anything that looks familiar.
 
+## Branching
+
+One branch per session. `main` is the integration branch — never commit to it
+directly.
+
+```sh
+git fetch origin main && git checkout -B "claude/<short-task-slug>" origin/main
+# ...first commit...
+git push -u origin HEAD          # push on the FIRST commit, not the last
+```
+
+Merge back into `main` before the session ends, then delete the branch.
+Full protocol: `docs/claude/WORKING-AGREEMENT.md` section 2.
+
 ## Hard rules
 
 1. **Never hand-edit `feed.xml`.** It is generated wholesale by
