@@ -115,6 +115,10 @@ Before writing code, confirm you can run the thing that will prove it works.
 "Done" means observed working, not written and plausible.
 
 - Run the verification command. Paste the actual output.
+- Prefer a command the repo already provides (a script, a make target, a CI job)
+  over an ad-hoc one you compose. If you find yourself writing a fresh check,
+  consider whether it belongs in the repo permanently — a check that only exists
+  in one session's scrollback gets rewritten by the next session.
 - If it fails, say it failed and show it. Never report success you did not see.
 - If you skipped a step, say which step and why.
 - Partially done is a legitimate answer. Silently-narrowed scope is not — if

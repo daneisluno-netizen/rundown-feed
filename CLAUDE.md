@@ -37,27 +37,21 @@ Full protocol: `docs/claude/WORKING-AGREEMENT.md` section 2.
 
 ## Verify before you claim it works
 
-Any change touching `feed.xml` must pass all three:
+One implementation, in `scripts/verify_feed.py`. CI runs exactly these commands
+(`.github/workflows/verify-feed.yml`), so what passes locally passes there.
 
 ```sh
-# 1. Well-formed XML
-python3 -c "import xml.dom.minidom; xml.dom.minidom.parse('feed.xml'); print('OK')"
-
-# 2. Every enclosure is reachable and is audio (not an HTML interstitial)
-python3 - <<'PY'
-import re, urllib.request
-for url in re.findall(r'<enclosure url="([^"]+)"', open('feed.xml').read()):
-    r = urllib.request.Request(url.replace('&amp;', '&'), method='HEAD')
-    with urllib.request.urlopen(r) as resp:
-        ct = resp.headers.get('Content-Type', '')
-        print(('OK  ' if 'audio' in ct else 'FAIL'), ct, url[:70])
-PY
-
-# 3. After push, Pages serves it as XML (allow ~60s for the deploy)
-curl -sI https://daneisluno-netizen.github.io/rundown-feed/feed.xml | grep -i content-type
+python3 scripts/verify_feed.py --structure     # offline: XML, guid, pubDate, enclosure shape
+python3 scripts/verify_feed.py --enclosures    # network: every audio URL serves audio
+python3 scripts/verify_feed.py --live          # network: Pages serves this feed as XML
+python3 scripts/verify_feed.py --all
 ```
 
-`content-type: application/xml` or `text/xml` is a pass. `octet-stream` is a fail.
+Exit 0 is a pass. Run `--structure --enclosures` before pushing; `--live` only
+means anything after a deploy, so run it after your merge to `main` lands.
+
+If you add a rule to this file that can be checked mechanically, add it to the
+script too. A rule only prose enforces is a rule that gets skipped.
 
 ## Facts worth not rediscovering
 

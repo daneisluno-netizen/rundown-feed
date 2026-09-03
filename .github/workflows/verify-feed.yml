@@ -1,0 +1,58 @@
+name: Verify feed
+
+# Runs the same checks a session runs locally (scripts/verify_feed.py), so CI
+# and CLAUDE.md cannot drift apart. The daily schedule matters as much as the
+# push trigger: Drive links die on their own when a file is moved or its
+# permissions change, and nothing in this repo would otherwise notice.
+
+on:
+  push:
+    branches: [main]
+    paths: ['feed.xml', 'scripts/verify_feed.py', '.github/workflows/verify-feed.yml']
+  pull_request:
+    paths: ['feed.xml', 'scripts/verify_feed.py', '.github/workflows/verify-feed.yml']
+  schedule:
+    - cron: '17 7 * * *'   # 07:17 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-feed-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  structure:
+    name: Structure (offline)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/verify_feed.py --structure
+
+  enclosures:
+    name: Enclosures reachable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/verify_feed.py --enclosures
+
+  live:
+    name: Pages serves the feed as XML
+    # Skipped on pull_request: the PR's feed is not deployed, so checking the
+    # live URL would test whatever is already on main and tell us nothing.
+    if: github.event_name != 'pull_request'
+    needs: [structure]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/verify_feed.py --live
