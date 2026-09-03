@@ -1,0 +1,67 @@
+# CLAUDE.md template
+
+Copy `WORKING-AGREEMENT.md`, `GOTCHAS.md` and this file into any repo, then fill
+this in and save it as `CLAUDE.md` at the repo root. Claude loads `CLAUDE.md`
+automatically; it does not read `README.md` unless told to. That is why the
+rules belong here and not in the README.
+
+Keep it under ~60 lines. This file is re-read on every session — length is a
+recurring token cost, and a long file gets skimmed rather than followed.
+
+Fill in every section. **"None" is a valid and useful answer** — it tells the
+next session it does not need to go looking.
+
+---
+
+```markdown
+# <repo name>
+
+<One line: what this is and what it is for.>
+
+Read `docs/claude/WORKING-AGREEMENT.md` before making changes.
+Read `docs/claude/GOTCHAS.md` before debugging anything that looks familiar.
+
+## Run it
+
+<The exact commands, copy-pasteable. Install, build, test, lint, dev server.>
+
+## Prerequisites you must check before starting
+
+<Every env var, secret, DSN, service and external dependency needed to RUN and
+TEST this repo — not just to build it. Name each one exactly.
+
+This section is the highest-value part of the file. The most expensive failure
+is a session that writes correct code, then cannot verify it because a variable
+was never set, and reports "done, untested" hours in.
+
+For each: the variable name, what it is for, where the value comes from, and
+what fails if it is missing.>
+
+| Variable | Purpose | Source | Symptom if missing |
+|---|---|---|---|
+| `EXAMPLE_URL` | … | … | … |
+
+## Branch and workflow
+
+- Active branch: <name>
+- <Who else pushes here. Whether multiple Claude sessions run against it.>
+- <Whether to commit directly or open a PR.>
+
+## Hard rules
+
+<Numbered. Only things that are non-obvious AND expensive to get wrong.
+Generated files that must not be hand-edited. Formats that must not change.
+Anything where the wrong choice fails silently rather than loudly.>
+
+## Verify before you claim it works
+
+<The exact commands that prove a change is good, and what a pass looks like.
+If verification requires something a session cannot do — a real DB, a device,
+your credentials — say so here, so it gets raised at the start instead of
+discovered at the end.>
+
+## Known state
+
+<Anything currently broken, half-finished, or deliberately odd. Update it when
+it changes. Prevents the next session from "fixing" something on purpose.>
+```
