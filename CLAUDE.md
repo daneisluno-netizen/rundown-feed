@@ -5,6 +5,8 @@ Served by GitHub Pages at https://daneisluno-netizen.github.io/rundown-feed/
 
 Read `docs/claude/WORKING-AGREEMENT.md` before making changes.
 Read `docs/claude/GOTCHAS.md` before debugging anything that looks familiar.
+See `docs/claude/BOOTSTRAP-PROMPTS.md` to install this system in another repo
+or as global rules.
 
 ## Branching
 
