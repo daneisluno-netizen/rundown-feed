@@ -87,19 +87,50 @@ it stays small only if a branch is one session, one coherent unit of work,
 merged back before the session ends. A branch that lives for days recreates
 the exact problem it was meant to solve.
 
-## 3. Preflight: prove you can verify BEFORE you build
+## 3. Get to something runnable early
 
-The expensive failure is doing the work and then discovering you cannot run it.
-Before writing code, confirm you can run the thing that will prove it works.
+The expensive failure is building for an hour and then finding out you cannot
+run it. Two situations lead there, and they need different responses. Work out
+which one you are in before you start.
 
-- Identify the verification command (test, build, lint, script, curl).
-- **Run it now, unchanged, and confirm it passes on current HEAD.** If it fails
-  before your change, that is a pre-existing failure — say so and do not adopt it.
-- Confirm the inputs it needs exist: env vars, DB connection strings, secrets,
-  services, network access. Check with `printenv NAME` — do not assume.
-- **Missing prerequisite → say so immediately, at the top of your reply, before
-  doing the work.** Do not build for twenty minutes and then report you cannot
-  test it. That is the pattern that costs the most.
+### A. Changing code that already exists
+
+A way to check it already exists too — a test, a build, a linter, a script, a
+request you can make. **Run it before you touch anything.**
+
+- **Passes** → you now have a known-good baseline and will know if you break it.
+- **Fails** → pre-existing failure. Say so now. Do not adopt it as yours, and do
+  not quietly fix it as a side quest.
+- **Will not run** — missing env var, no database, no credentials, service
+  unreachable → **stop and say so in your first reply, before doing the work.**
+
+Check prerequisites explicitly rather than assuming: `printenv NAME`, a
+connection attempt, `--version`. Assuming is how a session gets an hour in
+before discovering a connection string was never set.
+
+### B. Building something that does not exist yet
+
+There is no check to run first, so "verify before you build" is meaningless as
+written. The equivalent discipline is: **get to something that executes within
+the first few minutes, run it, then grow it.**
+
+- Write the smallest version that runs end to end — one function, one real
+  input, one real output — and run it.
+- Add the rest in increments, re-running as you go.
+- Do not write two hundred lines and execute them for the first time at the end.
+  That is the same failure as A, just self-inflicted: when it breaks you are
+  debugging two hundred unfamiliar lines instead of twenty.
+
+### Both cases: say what "working" means before you build it
+
+One line, at the top of your first reply:
+
+> This is done when `<command>` produces `<observable result>`.
+
+If you cannot finish that sentence, you do not understand the task well enough
+to start — ask instead. And if the command in it turns out not to be runnable,
+you have found that out in minute one rather than hour two, which is the whole
+point.
 
 ## 4. Read the real thing, not your memory of it
 
